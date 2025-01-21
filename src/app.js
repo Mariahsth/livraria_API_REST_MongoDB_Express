@@ -1,19 +1,23 @@
 import express from "express";
-import conectaNaDatabase from "../config/dbConnect.js";
+import db from "./config/dbConnect.js";
 import routes from "./routes/index.js";
+import manipuladorDeErros from "./middlewares/manipuladorDeErros.js";
+import manipulador404 from "./middlewares/manipulador404.js";
 
-const conexao= await conectaNaDatabase();           //await pois é função assincrona
 
-conexao.on("error", (erro)=>{                   //.on define um evento, nesse caso um erro
-    console.error("erro de conexão", erro);
-})
+db.on("error", console.log.bind(console, "Erro de conexão"));
+db.once("open", () => {
+  console.log("conexão com o banco feita com sucesso");
+});
 
-conexao.once("open", ()=>{                      //.once também aguarda um evento, nesse caso uma conexão
-    console.log("Conexão com o banco feito com sucesso")
-})
-
-const app=express();        //salvando o express na variável app
-
+const app = express();
+app.use(express.json());
 routes(app);
 
-export default app;	
+app.use(manipulador404);
+
+//middleware que será realizada em quase toda a requisição. Será utilizada para tratar os erros que forem lançados
+app.use(manipuladorDeErros);
+
+export default app;
+

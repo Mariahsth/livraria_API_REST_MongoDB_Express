@@ -1,18 +1,37 @@
-//Criar um modelo para cada livro que entre no banco
 import mongoose from "mongoose";
-import { autorSchema } from "./Autor.js";
 
-//Criar Schema (objeto de configuração que define a estrutura e as propriedades de um documento)
-const livroSchema=new mongoose.Schema({
-    id: {type: mongoose.Schema.Types.ObjectId},     //Definindo o tipo de dado de cada parametro
-    titulo:{type:String, require:true},             //required=obrigatório
-    editora:{type:String},
-    preco:{type: Number},
-    paginas:{type:Number},
-    autor: autorSchema              //Unindo autor e livro pelo método embedding
-}, {versionKey: false} )            //se refere ao versionamento do mongodb
+const livroSchema = new mongoose.Schema(
+  {
+    id: {type: String},
+    titulo: {
+      type: String, 
+      required: [true, "O título do livro é obrigatório"]
+    },
+    autor: {
+      type: mongoose.Schema.Types.ObjectId, 
+      ref: "autores", 
+      required: [true, "O autor(a) é obrigatório"]
+    },
+    editora: {
+      type: String, 
+      required: [true, "A editora é obrigatória"],
+      enum: {
+        values: ["Casa do código", "Alura"],
+        message: "A editora {VALUE} não é um valor permitido"
+      }
+    },
+    numeroPaginas: {
+      type: Number,
+      validate: {
+        validator: (valor)=>{
+          return valor >= 10 && valor <= 5000;
+        },
+        message: "O número de páginas deve estar entre 10 e 5000. Valor fornecido {VALUE}"
+      }
+    }
+  }
+);
 
-//defininfo o modelo "livro" (modelo é um objeto que representa uma coleção na base de dados, é uma interface)
-const livro=mongoose.model("livros", livroSchema);           //"livros" se refere a coleção criado no atlas, e o 2o parametro se refere qual schema ele se refere
+const livros= mongoose.model("livros", livroSchema);
 
-export default livro;
+export default livros;

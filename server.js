@@ -1,13 +1,8 @@
-
-//Instalar: nodemon, postman, express, mongodb, mongoose, dotenv
-
 import "dotenv/config";
-import app from "./src/app.js"; //pelo método express
+import app from "./src/app.js";
 
-const PORT=3000;        //Definindo a porta
+const port = process.env.PORT || 3000;
 
-
-
-app.listen(PORT, ()=>{               //listen=>Evento tipo uma conexão, neste caso na porta 3000
-    console.log("Servidor escutando!")
-})
+app.listen(port, () => {
+  console.log(`Servidor escutando em http://localhost:${port}`);
+});
